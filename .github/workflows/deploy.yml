@@ -31,7 +31,7 @@ jobs:
           cache: 'npm'
 
       - name: Installa le dipendenze del progetto
-        run: npm ci
+        run: npm install
 
       - name: Costruisci il sito (crea la cartella dist)
         run: npm run build
