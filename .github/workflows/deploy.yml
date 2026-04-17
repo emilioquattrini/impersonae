@@ -1,0 +1,50 @@
+# Nome dell'azione
+name: Deploy to GitHub Pages
+
+# Quando deve partire? Ogni volta che carichi (push) modifiche sul branch "main"
+on:
+  push:
+    branches: [ main ]
+
+# Permessi necessari a GitHub per pubblicare il sito
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Evita di far partire più pubblicazioni contemporaneamente
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  build_and_deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Scarica il codice
+        uses: actions/checkout@v4
+
+      - name: Installa Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Installa le dipendenze del progetto
+        run: npm ci
+
+      - name: Costruisci il sito (crea la cartella dist)
+        run: npm run build
+
+      - name: Configura GitHub Pages
+        uses: actions/configure-pages@v4
+
+      - name: Carica i file da pubblicare
+        uses: actions/upload-pages-artifact@v3
+        with:
+          # Indica a GitHub di prendere solo la cartella "dist"
+          path: './dist'
+
+      - name: Pubblica su GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
